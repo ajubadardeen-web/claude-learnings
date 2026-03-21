@@ -75,7 +75,17 @@ PYEOF
   echo "      -> Merged into $SETTINGS"
 fi
 
-# 5. Symlink or clone the learnings repo into ~/.claude/learnings
+# 5. Install post-commit hook (auto-push on every commit)
+echo "[4b/5] Installing post-commit hook..."
+HOOK="$REPO_DIR/.git/hooks/post-commit"
+cat > "$HOOK" << 'HOOKEOF'
+#!/bin/bash
+git push origin main
+HOOKEOF
+chmod +x "$HOOK"
+echo "      -> $HOOK (auto-pushes on every commit)"
+
+# 6. Symlink or clone the learnings repo into ~/.claude/learnings
 echo "[4/5] Setting up learnings directory..."
 if [ -L "$LEARNINGS_DIR" ] || [ -d "$LEARNINGS_DIR" ]; then
   echo "      ~/.claude/learnings already exists — skipping"
