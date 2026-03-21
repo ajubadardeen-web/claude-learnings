@@ -1,0 +1,50 @@
+# Global Claude Code Instructions (All Projects)
+
+## Memory Management Hygiene
+
+At the start of every session in any project:
+
+1. **Check for MEMORY.md** — look in the auto-memory directory for this project
+   (`~/.claude/projects/<project-key>/memory/MEMORY.md`). The SessionStart hook
+   will have already created a scaffold if it didn't exist.
+
+2. **Read MEMORY.md before doing anything else** — use it to orient yourself:
+   what's in flight, what the blockers are, what the user's preferences are.
+
+3. **Keep MEMORY.md under 200 lines** — only the first 200 lines load automatically.
+   Move detail to topic files (e.g. `debugging.md`, `patterns.md`, `decisions.md`)
+   and link to them from MEMORY.md.
+
+4. **Update MEMORY.md during the session** when:
+   - A new important table, API, or file path is confirmed
+   - A blocker is resolved or discovered
+   - A recurring error pattern is identified
+   - A significant architectural or design decision is made
+
+5. **Do not write duplicate memories** — check existing entries before adding new ones.
+   Update or remove stale entries rather than appending alongside them.
+
+6. **What NOT to save**:
+   - Session-specific task details or in-progress work
+   - Speculative conclusions from reading a single file
+   - Anything that duplicates the project's own CLAUDE.md
+
+## Learnings Log
+
+When the user says "save this as a learning" or "add to learnings":
+1. Create a new entry in `~/.claude/learnings/LEARNINGS.md` above the
+   `<!-- NEW LEARNINGS ADDED BELOW THIS LINE -->` marker
+2. Follow the existing entry format: title, date, tags, what/why/how, code reference
+3. If there is associated code, save it to `~/.claude/learnings/snippets/<category>/`
+4. Run: `cd ~/.claude/learnings && git add -A && git commit -m "Add learning: <title>" && git push`
+
+The learnings doc covers two sections:
+- **Section 1**: Claude Code setup & tooling (hooks, memory, config, automation)
+- **Section 2**: Prompting & model behaviour (context, accuracy, workflow patterns)
+
+## Universal User Preferences
+
+- Concise, technical responses
+- No emojis
+- Prefer data-backed recommendations over intuition
+- Ask before taking irreversible actions (git push, deleting files, sending messages)
