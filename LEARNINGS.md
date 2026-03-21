@@ -201,6 +201,46 @@ bash bootstrap-new-machine.sh
 `bootstrap-new-machine.sh` (full setup script)
 
 ---
+### 1.5 Allowlisting Tools to Eliminate Permission Prompts
+
+**Added**: 2026-03-20
+**Tags**: `#permissions` `#settings` `#mcp` `#claude-code`
+
+**What I learned**
+
+Claude Code prompts for permission on every tool call by default. You can
+eliminate these prompts by adding an `allow` array to the `permissions` block
+in `~/.claude/settings.json`. Built-in tools use the tool name with a glob
+pattern (e.g. `"Bash(*)"`) and MCP tools use the prefix `mcp__<server>__*`.
+The `allow` rules for built-in tools do NOT apply to MCP tools — they must be
+listed separately.
+
+Example config:
+```json
+"permissions": {
+  "allow": [
+    "Bash(*)", "Edit(*)", "Write(*)", "Read(*)", "Glob(*)", "Grep(*)",
+    "mcp__data-warehouse__*", "mcp__airbnb-core__*", "mcp__minerva__*",
+    "mcp__diagnose__*", "mcp__dataportal-mcp__*",
+    "mcp__google-drive-mcp__*", "mcp__gandalf__*", "mcp__glean-mcp__*"
+  ]
+}
+```
+
+**Why it matters**
+
+Without this, Claude prompts before every file read, shell command, and MCP
+call — constant interruptions that break flow, especially in data-heavy
+sessions with many warehouse queries.
+
+**How to replicate**
+
+Edit `~/.claude/settings.json` and add the `permissions.allow` block above.
+Takes effect immediately with no restart required.
+
+**Code**: N/A — inline config snippet above is sufficient.
+
+---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
 
 
