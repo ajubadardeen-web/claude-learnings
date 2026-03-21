@@ -157,5 +157,50 @@ you know about this project?" at the start of a session if unsure).
 **Code**: N/A — this is a process guideline, not a setup script.
 
 ---
+
+### 1.4 Portable Learnings Log with Auto-Push
+
+**Added**: 2026-03-20
+**Tags**: `#learnings` `#git` `#hooks` `#portability` `#knowledge-management`
+
+**What I learned**
+
+A dedicated git repo at `~/.claude/learnings/` acts as a portable, shareable
+knowledge base for reusable Claude and AI insights. Each entry in `LEARNINGS.md`
+follows a structured format (what/why/how + code file) so any learning can be
+replicated on a new machine. A `post-commit` git hook auto-pushes to GitHub on
+every commit — no manual push needed. A `bootstrap-new-machine.sh` script sets
+up the entire system (scripts, CLAUDE.md, settings hooks, post-commit hook) with
+one command.
+
+Two update triggers:
+- **Automatic**: the Stop hook nudges Claude after every substantive turn to
+  check whether anything is a reusable learning (vs. project-specific context
+  which goes to MEMORY.md instead)
+- **Explicit**: say "save this as a learning" — Claude writes the entry, commits,
+  and the post-commit hook pushes automatically
+
+Key gotcha: `.git/hooks/` is not tracked by git. The bootstrap script must
+explicitly recreate the post-commit hook on a new machine — it does this.
+
+**Why it matters**
+
+Without this, expertise with Claude accumulates only in your head and is lost
+when switching machines, starting a new role, or onboarding someone else.
+This system makes that expertise durable, transferable, and shareable.
+
+**How to replicate on a new machine**
+
+```bash
+git clone https://github.com/ajubadardeen-web/claude-learnings.git
+cd claude-learnings
+bash bootstrap-new-machine.sh
+```
+
+**Code**: `snippets/memory-management/` (all hook scripts + settings + CLAUDE.md template)
+`bootstrap-new-machine.sh` (full setup script)
+
+---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
+
 
