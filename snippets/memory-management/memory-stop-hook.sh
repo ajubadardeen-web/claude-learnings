@@ -1,8 +1,11 @@
 #!/bin/bash
-# memory-stop-hook.sh — only prompt memory update when substantive work was done
+# memory-stop-hook.sh — prompt memory + learnings update after substantive turns
 #
-# Only blocks if the last turn used write/execute tools (Edit, Write, Bash, SQL query).
-# Read-only or conversational turns exit silently.
+# Flow:
+#   1. Stop fires after every Claude response
+#   2. If stop_hook_active=true: second invocation, let Claude stop
+#   3. Check if the turn used write/execute tools — exit silently if not
+#   4. Block once and inject a dual reminder: project memory + global learnings
 
 INPUT=$(cat)
 
@@ -19,7 +22,6 @@ if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
 fi
 
 # Check if the last assistant turn used any write/execute tools
-# Look at the last 50 lines of the transcript for tool use in the final turn
 SUBSTANTIVE=$(tail -50 "$TRANSCRIPT" 2>/dev/null | python3 -c "
 import sys, json
 tools_used = set()
@@ -49,8 +51,8 @@ if [ "$SUBSTANTIVE" != "yes" ]; then
   exit 0
 fi
 
-# Substantive turn — prompt a memory check
+# Substantive turn — prompt memory check + learnings check
 jq -n '{
   "decision": "block",
-  "reason": "Memory check: save anything worth persisting to MEMORY.md (tables, blockers, errors, decisions), then stop."
+  "reason": "Before stopping: (1) save any project-specific findings to MEMORY.md (tables, blockers, errors, decisions); (2) if anything from this turn is a reusable Claude/AI/technical insight — not project-specific — add it to ~/.claude/learnings/LEARNINGS.md with a snippet and commit+push. Then stop."
 }'

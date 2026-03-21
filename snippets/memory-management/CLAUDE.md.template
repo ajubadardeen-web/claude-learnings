@@ -4,9 +4,8 @@
 
 At the start of every session in any project:
 
-1. **Check for MEMORY.md** — look in the auto-memory directory for this project
-   (`~/.claude/projects/<project-key>/memory/MEMORY.md`). The SessionStart hook
-   will have already created a scaffold if it didn't exist.
+1. **Check for MEMORY.md** — look in the auto-memory directory for this project.
+   The SessionStart hook will have already created a scaffold if it didn't exist.
 
 2. **Read MEMORY.md before doing anything else** — use it to orient yourself:
    what's in flight, what the blockers are, what the user's preferences are.
@@ -21,26 +20,48 @@ At the start of every session in any project:
    - A recurring error pattern is identified
    - A significant architectural or design decision is made
 
-5. **Do not write duplicate memories** — check existing entries before adding new ones.
+5. **Do not write duplicate memories** — check existing entries before adding.
    Update or remove stale entries rather than appending alongside them.
 
-6. **What NOT to save**:
+6. **What NOT to save to MEMORY.md**:
    - Session-specific task details or in-progress work
    - Speculative conclusions from reading a single file
    - Anything that duplicates the project's own CLAUDE.md
 
 ## Learnings Log
 
-When the user says "save this as a learning" or "add to learnings":
-1. Create a new entry in `~/.claude/learnings/LEARNINGS.md` above the
-   `<!-- NEW LEARNINGS ADDED BELOW THIS LINE -->` marker
-2. Follow the existing entry format: title, date, tags, what/why/how, code reference
-3. If there is associated code, save it to `~/.claude/learnings/snippets/<category>/`
-4. Run: `cd ~/.claude/learnings && git add -A && git commit -m "Add learning: <title>" && git push`
-
-The learnings doc covers two sections:
+`~/.claude/learnings/LEARNINGS.md` is a portable, shareable log of reusable
+insights about Claude and AI usage. It has two sections:
 - **Section 1**: Claude Code setup & tooling (hooks, memory, config, automation)
 - **Section 2**: Prompting & model behaviour (context, accuracy, workflow patterns)
+
+**When the user says "save this as a learning" or "add to learnings":**
+1. Add a new entry to `~/.claude/learnings/LEARNINGS.md` just above the
+   `<!-- NEW LEARNINGS ADDED BELOW THIS LINE -->` marker
+2. Follow the existing entry format:
+   ```
+   ### <number>.<n> <Title>
+   **Added**: YYYY-MM-DD
+   **Tags**: `#tag1` `#tag2`
+   **What I learned**
+   <2-4 sentences>
+   **Why it matters**
+   <practical impact>
+   **How to replicate** / **Actionable step**
+   <steps or reference to code file>
+   **Code**: `snippets/<category>/<filename>` (or N/A)
+   ```
+3. If there is associated code, save it to `~/.claude/learnings/snippets/<category>/`
+4. Commit and push:
+   ```
+   cd ~/.claude/learnings && git add -A && git commit -m "Add learning: <title>" && git push
+   ```
+
+**When the Stop hook fires** and there was substantive work this turn:
+- Check both: is there a project-specific finding for MEMORY.md? AND is there
+  a reusable insight worth adding to LEARNINGS.md?
+- Project-specific (wrong table name found, blocker hit) → MEMORY.md only
+- Reusable pattern (new hook mechanic, prompt technique, model behaviour) → LEARNINGS.md + commit + push
 
 ## Universal User Preferences
 
