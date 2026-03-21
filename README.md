@@ -7,8 +7,8 @@ replicate the learning on a new machine.
 ## Quick Setup (new machine)
 
 ```bash
-git clone <this-repo-url>
-cd <repo>
+git clone https://github.com/ajubadardeen-web/claude-learnings.git
+cd claude-learnings
 bash bootstrap-new-machine.sh
 ```
 
