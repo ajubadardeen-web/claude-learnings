@@ -241,6 +241,42 @@ Takes effect immediately with no restart required.
 **Code**: N/A — inline config snippet above is sufficient.
 
 ---
+### 1.6 Use launchd Instead of cron on macOS
+
+**Added**: 2026-03-22
+**Tags**: `#scheduling` `#launchd` `#cron` `#macos` `#automation`
+
+**What I learned**
+
+macOS cron does not retroactively run jobs missed while the machine is asleep.
+If a laptop is in Deep Idle at the scheduled time, the job is silently skipped
+with no log, no retry, and no notification. `launchd` with
+`StartCalendarInterval` solves this — it fires the missed job as soon as the
+Mac wakes up. This is the Apple-recommended scheduler for macOS; cron is a
+legacy compatibility layer.
+
+Discovered this when a Sunday 21:03 cron job never ran because the Mac was
+asleep, while a 22:07 job on the same night succeeded (Mac had woken by then).
+`pmset -g log` confirmed the sleep/wake timeline.
+
+**Why it matters**
+
+Any recurring automation on a laptop (weekly reports, memory maintenance,
+data pulls) is unreliable with cron because laptops sleep unpredictably.
+Switching to launchd makes scheduled tasks resilient to sleep with zero
+additional complexity.
+
+**How to replicate**
+
+1. Create a plist in `~/Library/LaunchAgents/com.claude.<job-name>.plist`
+   (see template in `snippets/scheduling/launchd-template.plist`)
+2. `launchctl load ~/Library/LaunchAgents/com.claude.<job-name>.plist`
+3. Remove any corresponding crontab entry
+4. Verify: `launchctl list | grep com.claude`
+
+**Code**: `snippets/scheduling/launchd-template.plist`
+
+---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
 
 

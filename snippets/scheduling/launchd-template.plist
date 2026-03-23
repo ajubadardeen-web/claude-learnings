@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template for recurring Claude Code scheduled tasks.
+  Copy, rename, and edit the Label, ProgramArguments, StartCalendarInterval,
+  and log paths. Then: launchctl load <path>
+
+  StartCalendarInterval keys:
+    Weekday: 0=Sunday .. 6=Saturday (omit for daily)
+    Hour: 0-23
+    Minute: 0-59
+    Month: 1-12 (omit for every month)
+    Day: 1-31 (omit for every day)
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claude.JOBNAME</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/aju_badardeen/.claude/scripts/run-JOBNAME.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>0</integer>
+        <key>Hour</key>
+        <integer>22</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/Users/aju_badardeen/.claude/scripts/launchd-JOBNAME.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/aju_badardeen/.claude/scripts/launchd-JOBNAME.err</string>
+</dict>
+</plist>
