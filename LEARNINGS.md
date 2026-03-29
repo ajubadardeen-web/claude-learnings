@@ -309,7 +309,19 @@ Key API details:
 - `gdrive_slides_get_slide` gives single-slide element detail
 - **Limitation**: Grouped elements are opaque -- the API returns groups as containers without recursing into children. Decision tree diagrams, flow charts, and other grouped shapes are invisible.
 - **Limitation**: Embedded images return as image-type elements with no visual content
-- **Workaround**: Cross-reference with surrounding slides (ungrouped versions) and document knowledge. If still opaque, ask the user to screenshot the slide and read the image file visually (Claude is multimodal).
+
+**Auto-export slides as images (SOLVED):**
+Use `~/.claude/scripts/export-slides.py` to export any Google Slides deck as high-res PNGs:
+```
+python3 ~/.claude/scripts/export-slides.py <presentation_id> [output_dir]
+```
+- Uses Drive API `files.export` to get PDF, then `pdftoppm` (poppler) to convert pages to 300 DPI PNGs
+- First run opens browser for OAuth consent (one-time). Token saved at `~/.claude/scripts/slides-token.json`
+- Prerequisites: `google-api-python-client`, `google-auth-oauthlib` (pip), `poppler` (brew)
+- Client secret file must exist at `~/Downloads/client_secret_523208945357-*.json`
+- Output: `slide-1.png`, `slide-2.png`, etc. in the output directory (default: `/tmp/slides-<id>/`)
+- Read individual PNGs with the Read tool -- Claude is multimodal and can see all visual content (diagrams, charts, grouped elements, images)
+- **This is the definitive approach for decks**: always export slides as images first, then read visually. The text-only MCP tools miss too much visual content (50%+ of a typical deck is diagrams/charts/images).
 
 **Why it matters**
 
@@ -324,7 +336,7 @@ For any new project with a corpus of Google Docs to study:
 4. Synthesize into: doc inventory, knowledge base, unified timeline
 5. Save to project memory files
 
-**Code**: N/A -- this is a methodology pattern, not a code artifact.
+**Code**: `~/.claude/scripts/export-slides.py` (slide image export script)
 
 ---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
