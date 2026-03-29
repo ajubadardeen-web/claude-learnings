@@ -303,6 +303,14 @@ Key API details:
 - Rate limits apply -- budget ~3-4 diffs per doc before hitting limits
 - For multi-tab docs, read each tab separately using the `tabId` parameter
 
+**Google Slides specifics:**
+- `gdrive_read_file` (text format) extracts all text but strips images -- good for quick scan
+- `gdrive_slides_get_presentation_map` returns every element with objectId, type, text, and position geometry (EMU units) -- good for reconstructing layouts
+- `gdrive_slides_get_slide` gives single-slide element detail
+- **Limitation**: Grouped elements are opaque -- the API returns groups as containers without recursing into children. Decision tree diagrams, flow charts, and other grouped shapes are invisible.
+- **Limitation**: Embedded images return as image-type elements with no visual content
+- **Workaround**: Cross-reference with surrounding slides (ungrouped versions) and document knowledge. If still opaque, ask the user to screenshot the slide and read the image file visually (Claude is multimodal).
+
 **Why it matters**
 
 Documents about the same initiative often contradict each other because they were written at different times. A planning doc from November may have targets that were revised down in February's PRD. Without the temporal dimension, you can't tell which numbers are current. This methodology produces an accurate, conflict-resolved understanding that would take a human hours of manual cross-referencing.
