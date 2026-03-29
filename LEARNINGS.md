@@ -277,6 +277,48 @@ additional complexity.
 **Code**: `snippets/scheduling/launchd-template.plist`
 
 ---
+### 2.2 Deep Document Research: Revision-History-Aware Multi-Doc Processing
+
+**Added**: 2026-03-29
+**Tags**: `#research` `#google-docs` `#revision-history` `#multi-doc` `#methodology`
+
+**What I learned**
+
+When studying a body of work across multiple Google Docs/Slides, reading content alone is insufficient -- you lose the temporal dimension of *when* information was added, which determines what's most current when docs conflict. The right approach is:
+
+1. **Extract all doc IDs from URLs upfront** and deduplicate (same doc may appear with different tab/heading anchors)
+2. **Spin off parallel sub-agents** (one per unique document) that each:
+   - Read full content in markdown format (preserves structure)
+   - List revision history (`gdrive_revisions` action=list, pageSize=100)
+   - Strategically diff key revisions (earliest vs middle, middle vs latest) to build a change timeline
+   - Return: title, detailed content summary, and chronological timeline of additions
+3. **Read hub docs for linked references** -- central docs often link to additional docs. Spin off a second wave of agents for linked docs (1 level deep suffices)
+4. **Stitch together chronologically** -- use revision timestamps across all docs to build a unified timeline, resolving conflicts by recency
+5. **Save structured output** to memory: a doc inventory (IDs, owners, dates), a knowledge base (organized by topic), and a timeline
+
+Key API details:
+- `gdrive_revisions` with action="list" returns revision IDs + timestamps
+- `gdrive_revisions` with action="diff" shows what changed between two revisions
+- `gdrive_activity` (via the activity log) provides edit/comment/rename events even when revision API is restricted
+- Rate limits apply -- budget ~3-4 diffs per doc before hitting limits
+- For multi-tab docs, read each tab separately using the `tabId` parameter
+
+**Why it matters**
+
+Documents about the same initiative often contradict each other because they were written at different times. A planning doc from November may have targets that were revised down in February's PRD. Without the temporal dimension, you can't tell which numbers are current. This methodology produces an accurate, conflict-resolved understanding that would take a human hours of manual cross-referencing.
+
+**Actionable step**
+
+For any new project with a corpus of Google Docs to study:
+1. Collect all URLs, extract file IDs
+2. Launch parallel agents with the prompt template: "Read content (markdown), list revisions (pageSize=100), diff key revisions, return: title + content summary + change timeline"
+3. After first wave completes, scan content for linked doc URLs and launch a second wave
+4. Synthesize into: doc inventory, knowledge base, unified timeline
+5. Save to project memory files
+
+**Code**: N/A -- this is a methodology pattern, not a code artifact.
+
+---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
 
 
