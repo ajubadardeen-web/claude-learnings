@@ -338,6 +338,40 @@ For any new project with a corpus of Google Docs to study:
 
 **Code**: `~/.claude/scripts/export-slides.py` (slide image export script)
 
+### 1.7 Three-Layer Knowledge Distillation System
+
+**Added**: 2026-03-29
+**Tags**: `#memory` `#domain-knowledge` `#knowledge-management` `#automation` `#hooks`
+
+**What I learned**
+
+Claude Code's memory system works best with three distinct knowledge layers, each with its own storage, routing, and lifecycle:
+
+1. **Project memory** (`~/.claude/projects/<key>/memory/`) -- project-specific context (tables used, blockers, decisions). Auto-updated by Stop hook. Use topic subdirectories (`domain/`, `tools/`, `decisions/`) to keep MEMORY.md under 200 lines.
+2. **Learnings** (`~/.claude/learnings/LEARNINGS.md`) -- reusable Claude/AI tooling insights. Manual trigger only ("save this as a learning"). Git-tracked with auto-push.
+3. **Domain knowledge** (`~/.claude/domain-knowledge/`) -- business domain expertise that spans projects. Auto-updated by Stop hook. Organized by topic files (tables, policies, models, auth, metrics, teams).
+
+The key insight: LEARNINGS covers *how to use the tools*, project memory covers *what you're doing right now*, and domain knowledge covers *what you know about your business domain*. Without the third layer, domain expertise discovered across many projects stays siloed in individual MEMORY.md files and never compounds.
+
+The Stop hook triggers distillation by including all three destinations in its block reason. Widening the hook trigger to include MCP exploration tools (find_tables, get_table_schema, glean_search, etc.) ensures read-heavy data exploration sessions also trigger knowledge capture -- not just write-heavy sessions.
+
+Weekly consolidation (via the existing memory-updater launchd job) handles decay of stale entries and deduplication across all three layers.
+
+**Why it matters**
+
+Without domain knowledge distillation, every new Claude Code session in a new project directory starts from zero on business domain context, even if you've explored the same tables and policies dozens of times in other projects. The domain knowledge corpus makes expertise compound across all projects automatically.
+
+**Actionable step**
+
+1. Create `~/.claude/domain-knowledge/` with topic files for your domain
+2. Add a "Knowledge Routing" section to `~/.claude/CLAUDE.md` defining the three destinations
+3. Update the Stop hook reason to include domain knowledge as a third check
+4. Widen the Stop hook trigger set to include MCP exploration tools (data-warehouse, dataportal, Glean, Minerva)
+5. Add decay/consolidation steps to the weekly memory-updater prompt
+6. Trigger manually with "save this as domain knowledge"
+
+**Code**: N/A -- changes spread across `~/.claude/CLAUDE.md` (Knowledge Routing section), `~/.claude/scripts/memory-stop-hook.sh` (widened triggers + third destination), `~/.claude/scripts/memory-update-prompt.txt` (Step 6 decay/consolidation), and `~/.claude/domain-knowledge/` (topic files).
+
 ---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
 
