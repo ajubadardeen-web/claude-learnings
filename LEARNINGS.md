@@ -375,4 +375,32 @@ Without domain knowledge distillation, every new Claude Code session in a new pr
 ---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
 
+### 1.8 Inserting Tables into Existing Google Docs
+
+**Added**: 2026-03-29
+**Tags**: `#google-docs` `#tables` `#mcp` `#workaround`
+
+**What I learned**
+
+The Google Drive MCP `gdrive_edit_doc` tool only supports plain text operations (appendText, replaceAllText, insertText) — it cannot insert structured tables. But Google Docs API `batchUpdate` can, via `insertTable`, `insertText` (into cells), and `updateTableCellStyle` / `updateTextStyle` for formatting. The trick: use `google-api-python-client` (already installed in `~/.venv/insight_miner/`) with the OAuth token from `~/projects/meeting-processor/token.json` (scopes: `documents`, `drive.file`).
+
+**Why it matters**
+
+Tabular data rendered as plain text lines in Google Docs is unusable in professional PRDs. This was a known limitation that previously required a manual copy-paste workaround (create a companion doc with `gdrive_create` + `contentFormat: "html"`, then user copies tables manually). The direct API approach is fully automated.
+
+**How to replicate**
+
+1. Auth: load token from `~/projects/meeting-processor/token.json` + `credentials.json` into `google.oauth2.credentials.Credentials`
+2. Build service: `build('docs', 'v1', credentials=creds)`
+3. Read doc: `service.documents().get(documentId=..., includeTabsContent=True)` — parse tab body for element indices
+4. Insert table: `batchUpdate` with `insertTable` request at target index
+5. Re-read doc to discover cell paragraph indices (they're not predictable from table dimensions alone)
+6. Fill cells: `insertText` into each cell's paragraph index — **process in REVERSE index order** to avoid shifting
+7. Style: `updateTableCellStyle` for backgrounds, `updateTextStyle` for bold/color/font-size
+8. For multi-tab docs, always include `tabId` in location objects
+
+**Code**: `/tmp/insert_tables.py` — full reference implementation with 5-table insertion, header styling (#FF385C bg + white text), alternating row colors, and text formatting.
+
+---
+
 
