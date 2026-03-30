@@ -375,6 +375,95 @@ Without domain knowledge distillation, every new Claude Code session in a new pr
 ---
 <!-- NEW LEARNINGS ADDED BELOW THIS LINE -->
 
+### 1.9 Auto Mode: AI-Classified Permissions
+
+**Added**: 2026-03-30
+**Tags**: `#permissions` `#auto-mode` `#settings` `#claude-code`
+
+**What I learned**
+
+Claude Code v2.1.85+ supports `permissions.defaultMode: "auto"` in settings.json.
+Instead of prompting for every tool call or blanket-allowing everything, a two-layer
+AI classifier decides whether each action needs user approval. Anthropic reports
+0.4% false positive rate (blocks something it shouldn't). This sits between the
+manual `default` mode (prompt for everything) and `bypassPermissions` (allow
+everything with no safety net).
+
+Auto mode stacks with explicit `allow` rules -- anything in the `allow` array is
+still auto-approved without hitting the classifier. The classifier only evaluates
+actions not covered by explicit rules.
+
+**Why it matters**
+
+Eliminates permission prompt interruptions in interactive sessions while maintaining
+a safety net for destructive or unexpected actions. Especially useful for MCP-heavy
+workflows where dozens of tool calls per session would otherwise require constant
+approval. Enables unattended overnight analysis runs without `--dangerously-skip-permissions`.
+
+**How to replicate**
+
+Add to `~/.claude/settings.json`:
+```json
+"permissions": {
+  "defaultMode": "auto",
+  "allow": [...]
+}
+```
+Takes effect on next session. First activation shows a one-time opt-in prompt.
+
+**Code**: N/A -- single settings.json change.
+
+---
+
+### 1.10 Parallel Worktrees with --worktree / /batch
+
+**Added**: 2026-03-30
+**Tags**: `#worktree` `#batch` `#parallelism` `#claude-code` `#productivity`
+
+**What I learned**
+
+Claude Code supports `--worktree` (`-w`) to spin up isolated git worktrees, each
+with its own Claude session. The `/batch` slash command scales this to 5-30 parallel
+worktrees in one command. Each worktree gets its own branch and working directory,
+so parallel tasks don't interfere with each other.
+
+Use cases where this shines:
+- Multiple independent PRDs or documents
+- Parallel SQL analyses across different datasets
+- Code reviews of unrelated PRs
+- Any set of tasks with no data dependencies between them
+
+This is a CLI flag / slash command, not a persistent setting. No config change
+needed -- invoke per-session when work is parallelizable.
+
+**Why it matters**
+
+Transforms sequential workflows into parallel ones. Writing 4 independent PRDs
+sequentially takes 4x the wall-clock time; with /batch, they run simultaneously.
+The isolation (separate git branches) prevents the common problem of context
+bleed between unrelated tasks in a single session.
+
+**How to replicate**
+
+For a single parallel task:
+```bash
+claude -w "feature-name" "Write the PRD for feature X"
+```
+
+For multiple parallel tasks:
+```
+/batch
+> Task 1: Write PHRE PRD
+> Task 2: Write Flex Auth PRD
+> Task 3: Analyze auth method distributions
+```
+
+Pair with `--tmux` to get each worktree in its own terminal pane.
+
+**Code**: N/A -- built-in CLI feature.
+
+---
+
 ### 1.8 Inserting Tables into Existing Google Docs
 
 **Added**: 2026-03-29
